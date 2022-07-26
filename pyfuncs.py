@@ -55,7 +55,7 @@ def sweetviz_univariada(df):
 
 
 def transformacoes(df, tipo_arquivo):
-    if tipo_arquivo = 'csv':
+    if tipo_arquivo == 'csv':
       try:
         df = pd.read_csv(df)
       except:
