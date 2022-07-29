@@ -1,8 +1,10 @@
 import numpy as np 
 import pandas as pd 
 from sklearn.model_selection import train_test_split 
-from sklearn.metrics import classification_report 
+from sklearn.metrics import classification_report, roc_auc_score
 from sklearn.linear_model import LogisticRegression
+from sklearn.ensemble import RandomForestClassifier 
+from sklearn.preprocessing import OneHotEncoder
 import matplotlib.pyplot as plt 
 
 
@@ -27,26 +29,6 @@ vars_int = [
 
 
 
-def return_df_dummies(df, vars_cat):
-
-  '''
-  Função criada para realizar one-hot encoding das variáveis
-  '''
-
-  all_dummies = [] 
-  for var in vars_cat:
-    num_cat_unicos = df[var].value_counts().index
-    if num_cat_unicos > 2:
-      dummies_var = pd.get_dummies(df[var], drop_first =  True)
-      all_dummies.append(dummies_var)
-
-    elif num_cat_unicos == 2:
-      dummie_double = np.where(df[var] == df[var].unique()[0], 0 )
-      all_dummies.append(dummie_double)
-      
-  df_dummies = pd.concat(all_dummies)
-
-
 def sweetviz_univariada(df):
     import sweetviz as sv 
 
@@ -65,38 +47,34 @@ def transformacoes(df, tipo_arquivo):
 
 
 
+class Preprocessamento:
 
-class Separa_df:
-
-  def __init__(self ,df, var_safra ,max_dev, coluna_target):
-      self.df = df 
-      self.var_safra = var_safra
-      self.max_dev = max_dev 
-      self.coluna_target = coluna_target
+  def __init__(self, df, vars_continuas, vars_discretas):
+    self.df = df
+    self.vars_cat = vars_cat
+    self.vars_continuas = vars_continuas
+    self.vars_discretas = vars_discretas 
 
 
-  def one_hot(self):
-    from sklearn.preprocessing import OneHotEncoder 
-
-    
-    drop_enc = OneHotEncoder(drop = 'first').fit()
-
-  def _divide_dev_oot(self):
-      df_dev = self.df[self.df[self.var_safra] <= self.max_dev]
-      df_oot = self.df[self.df[self.var_safra] >  self.max_dev]
-
-      return df_dev, df_oot 
-
+  def return_one_hot(self, N = 100):
   
-  def split_(self, cols_to_drop = []):
-      from sklearn.model_selection import train_test_split 
+    var_cat_to_one_hot = [var for var in vars_cat if self.df[var].nunique() < N]
 
-      tmpX = self.df.drop(cols_to_drop)
-      tmpXcol = tmpX.columns 
+    enc = OneHotEncoder(handle_unknown = 'ignore')
 
-      X_train, X_test, y_train, y_test = train_test_split(self.df[tmpXcol], self.df['Target'])
+    colunas_one_hot = enc.fit_transform(self.df[var_cat_to_one_hot]).toarray()
 
-      return X_train, X_test, y_train, y_test 
+    tmpDf = pd.DataFrame(colunas_one_hot, columns = enc.get_feature_names()) 
+
+
+  def padroniza(self, cols_escalonar):
+    from sklearn.preprocessing import StandardScaler
+
+    scaler = StandardScaler()
+
+    colunas_escalonadas = scaler.fit_transform(self.df[[cols_escalonar]])
+
+    tmpDf = pd.DataFrame(colunas_escalonadas, columns = cols_escalonar)
 
 
 
