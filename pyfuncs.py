@@ -55,16 +55,19 @@ class Preprocessamento:
     self.vars_continuas = vars_continuas
     self.vars_discretas = vars_discretas 
 
-
   def return_one_hot(self, N = 100):
   
-    var_cat_to_one_hot = [var for var in vars_cat if self.df[var].nunique() < N]
+    var_cat_to_one_hot = [var for var in self.vars_cat if self.df[var].nunique() < N]
 
     enc = OneHotEncoder(handle_unknown = 'ignore')
 
     colunas_one_hot = enc.fit_transform(self.df[var_cat_to_one_hot]).toarray()
 
-    tmpDf = pd.DataFrame(colunas_one_hot, columns = enc.get_feature_names()) 
+    #tmpDf = pd.DataFrame(colunas_one_hot, columns = enc.get_feature_names()) 
+
+    self.df[enc.get_feature_names()] = colunas_one_hot
+
+    self.df = self.df.drop(var_cat_to_one_hot, axis = 1)
 
 
   def padroniza(self, cols_escalonar):
@@ -72,10 +75,17 @@ class Preprocessamento:
 
     scaler = StandardScaler()
 
-    colunas_escalonadas = scaler.fit_transform(self.df[[cols_escalonar]])
+    colunas_escalonadas = scaler.fit_transform(self.df[cols_escalonar])
 
-    tmpDf = pd.DataFrame(colunas_escalonadas, columns = cols_escalonar)
+    self.df[cols_escalonar] = self.df[colunas_escalonadas]
 
+    self.df = self.df.drop(cols_escalonar)
+    #tmpDf = pd.DataFrame(colunas_escalonadas, columns = cols_escalonar)
+
+  def amostragem(self, frac):
+
+    self.df = self.df.sample(frac = frac)
+    return 
 
 
 
