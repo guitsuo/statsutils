@@ -82,11 +82,24 @@ class Preprocessamento:
     self.df = self.df.drop(cols_escalonar)
     #tmpDf = pd.DataFrame(colunas_escalonadas, columns = cols_escalonar)
 
-  def amostragem(self, frac):
+  @staticmethod
+  def _retorna_tipos_validos(self, tipo, tipos_validos):
+    if tipo not in tipos_validos:
+      raise ValueError(f"Preencha corretamente, conforme opções em {tipos_validos}")
 
-    self.df = self.df.sample(frac = frac)
+  def amostragem(self, tipo, frac):
+    
+    tipos_validos = ('desbalanceado', 'under', 'over')
+
+    resultado = self._retorna_tipos_validos(tipo = tipo, tipos_validos = tipos_validos)
+
+    if tipo == 'desbalanceado':
+      self.df = self.df.sample(frac = frac)
+
     return 
 
+  
+  
 
 
 def corrige_tipo_variavel(df, var_explicat_cont = [], var_explicat_disc = [], var_explicat_cat = []):
