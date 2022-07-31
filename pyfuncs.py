@@ -87,14 +87,32 @@ class Preprocessamento:
     if tipo not in tipos_validos:
       raise ValueError(f"Preencha corretamente, conforme opções em {tipos_validos}")
 
+  
+
+class split:
+
+  def __init__(self,df):
+    self.df = df 
+
+  def split_df(self, divisao, var_explicat, target):
+    from sklearn.model_selection import train_test_split 
+    divisoes = ('OOS','OOT', 'Ambos')
+
+    if divisao == 'OOS':
+      X, y = train_test_split(self.df[var_explicat], self.df[target])    
+
+
   def amostragem(self, tipo, frac):
     
     tipos_validos = ('desbalanceado', 'under', 'over')
 
     resultado = self._retorna_tipos_validos(tipo = tipo, tipos_validos = tipos_validos)
 
+
     if tipo == 'desbalanceado':
       self.df = self.df.sample(frac = frac)
+
+    elif tipo == 'balanceado':
 
     return 
 
