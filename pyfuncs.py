@@ -49,7 +49,7 @@ def transformacoes(df, tipo_arquivo):
 
 class Preprocessamento:
 
-  def __init__(self, df, vars_continuas, vars_discretas):
+  def __init__(self, df, vars_cat , vars_continuas, vars_discretas):
     self.df = df
     self.vars_cat = vars_cat
     self.vars_continuas = vars_continuas
@@ -77,16 +77,15 @@ class Preprocessamento:
 
     colunas_escalonadas = scaler.fit_transform(self.df[cols_escalonar])
 
-    self.df[cols_escalonar] = self.df[colunas_escalonadas]
+    self.df = self.df.drop(cols_escalonar, axis = 1)
 
-    self.df = self.df.drop(cols_escalonar)
-    #tmpDf = pd.DataFrame(colunas_escalonadas, columns = cols_escalonar)
+    self.df[cols_escalonar] = colunas_escalonadas
+
 
   @staticmethod
   def _retorna_tipos_validos(self, tipo, tipos_validos):
     if tipo not in tipos_validos:
       raise ValueError(f"Preencha corretamente, conforme opções em {tipos_validos}")
-
   
 
 class split:
